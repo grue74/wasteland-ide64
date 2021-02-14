@@ -44,6 +44,7 @@ order:
 - Ultimate 64 + ucodenet
 - Sublime Text 3
 - 64tass
+- TinyCrunch
 - 010 Editor
 - Ida pro
 - C64debugger
