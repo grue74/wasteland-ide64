@@ -1,6 +1,5 @@
 ; 
 ; Wasteland IDE fix by Grue & TNT
- 
 ;	.cpu "6502"
 
 track			= $f8
@@ -22,17 +21,17 @@ timetest		= $fffd
 
 
 				* = $3000
-start			lda #$00 								; black is very beautiful, dont you agree?
+start			sei										; we dont need interrupts where we are going, atleast not yet
+				lda #$00 								; black is very beautiful, dont you agree?
 				sta $d020
 				sta $d021
-
+				
 ; PAL / NTSC check, Grahams variant from codebase64
 w0				LDA $D012
 w1				CMP $D012
     			BEQ w1
     			BMI w0
 ; end of codebase64 code
-
 	   			cmp #$37								; check are we running PAL system
     			beq pal									; if so, then skip ntsc fixes
   				lda #$24 								; as ntsc clock runs 60hz, we need to adjust our time running code vs pal 50hz
@@ -62,7 +61,6 @@ pal				lda #3
 				sta $c001
 
 ; Start initial game setup
-				sei										; Disable interrupts as we switch kernal rom off
 				lda #%00101011							; irq on top of the screen and bitmap mode on, screen off
 				sta $d011 
 				lda #$35
@@ -78,7 +76,7 @@ pal				lda #3
 				txs 									; set stackpointer to default value
 
 				ldx #4 									; transfer loader code into its place $fc00-$ffff
-				ldy #0 									; this will also set NMI & IRQ addresses
+				ldy #0 									
 mod:			lda loader_code,y
 				sta $fc00,y
 				iny
@@ -94,16 +92,16 @@ mod:			lda loader_code,y
 				bne -
 
 				lda #$34
-				sta $01 								; switch IO addresses off for RAM under IO
+				sta $01 								; switch IO addresses off for copying stuff under IO
 -				lda io_code_tbl,y 						; Copy code under IO space
 				sta $dd80,y
 				iny
 				bpl -
 				
 				lda #$36
-				sta $01	 								; IO back on, Basic off, Kernal on
+				sta $01	 								; IO back on, Basic Off, Kernal On
 				jsr fopen								; open files
-				lda #$35								; Kernal off
+				lda #$35								; Kernal off (this is mandatory as loader is under kernal mem)
 				sta $01
 
 ; load game font into memory for enabling text showing sprites
