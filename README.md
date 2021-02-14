@@ -13,7 +13,7 @@ Enhancements done so far:
 
 - Save the game in a separate "SAVE" file.
 - Time handler moved from busy loop to IRQ-based counter. Now, it won't run too fast with Turbo.
-- PAL / NTSC adjustments to the Time counter.
+- PAL / NTSC adjustments to the Time counter. Small adjustment is also needed on sprite positions on ntsc screens at the loading picture screen.
 - It is now possible to hold left shift or use shift lock for speeding up the time for healing, but be sure to be in a safe place to avoid random encounters.
 - Much better random number generator was added. The original routine was using $d012 and $dc04 for entropy. When running CPU faster speed, those get more and more non-random in nature. The new code is from codebase64.org.
 - It is now possible to use original game floppies to create play image "WL" Just merge existing d64's if your play floppies and rename it to WL, and commence playing. You need a clean "SAVE" file and choose not to load your latest save on the Intro screen to get going.
