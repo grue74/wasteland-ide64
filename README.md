@@ -48,6 +48,6 @@ order:
 - C64debugger
 - Ghidra
 - Vice
-- Max roast level Coffee
+- Max roast level Coffee and tea
 
 // Grue 2021
