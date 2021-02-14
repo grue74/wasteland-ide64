@@ -29,25 +29,25 @@ TODO:
  
 
 Thanks to:
-Soci / Singular for help and code!
-TNT / Beyond Force for code, help, support and teaching me finesse of 6502 asm.
-Trurl / Extend for help, testing, suggestions and on going testing to find those little bugs and annoyances. You can thank Trurl for a such smooth experience.
-All my friends on irc channel bearing my ongoing frustration with the creepy  irradiated wasteland bugs.
+- Soci / Singular for help and code!
+- TNT / Beyond Force for code, help, support and teaching me finesse of 6502 asm.
+- Trurl / Extend for help, testing, suggestions and on going testing to find those little bugs and annoyances. You can thank Trurl for a such smooth experience.
+- All my friends on irc channel bearing my ongoing frustration with the creepy  irradiated wasteland bugs.
 	
 And to all IDE64 fans!
 
 Tools used for making this IDE64 fix possible, not in any particular
 order:
 
-IDE64
-Ultimate 64 + ucodenet
-Sublime Text 3
-64tass
-010 Editor
-Ida pro
-C64debugger
-Ghidra
-Vice
-Max roast level Coffee
+- IDE64
+- Ultimate 64 + ucodenet
+- Sublime Text 3
+- 64tass
+- 010 Editor
+- Ida pro
+- C64debugger
+- Ghidra
+- Vice
+- Max roast level Coffee
 
 // Grue 2021
