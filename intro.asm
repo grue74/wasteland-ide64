@@ -1,11 +1,11 @@
-intro			lda #$00
-				
+intro
+	
 ; Clear Memory for Sprites 1 and 2
+				ldx #$7f
 				lda #$00
 -				sta $4040,x
 				dex
 				bpl -
-
 				lda #$ff
 				sta $7fff 						; fill last byte of the bank to hide sceen paper color
 				jsr show_load_img 				; set bitmap colors and io-stuff into place
