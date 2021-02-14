@@ -9,8 +9,6 @@ Please note that this game will write its progress directly into the WL file, so
 
 Please make sure to make copies of your SAVE file, it is easy to get stuck, rendering your savegame unusable.
 
-I added an indicator on the upper right corner of the screen to show when the game is loading or saving. When there's L, it's loading and S when saving. There is a Utils menu presented on the intro screen, it is not working as its meaning is just to make new game floppies, and since we are not using floppies, you do not need it. So it's completely normal that the game will hang if you try to load it. 
-
 Enhancements done so far: 
 
 - Save the game in a separate "SAVE" file.
