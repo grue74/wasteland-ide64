@@ -175,7 +175,7 @@ chrout_			jsr $ffff 						; using chrout
 clrchn_			jmp $ffff 						; call clrchn
 
 write_to_file: 	jsr swap_memory2				; swap memory
-				jsr check 						; check if we're saving RO file
+				jsr check 						; check if we're saving SAVE file
 				jsr seek_pos 					; seek file position for save
 filno			ldx #12							; file number
 				jsr chkout_						; set for input

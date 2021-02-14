@@ -83,17 +83,6 @@ ntsc2			lda #254						; y coord for backup save 254 for pal, 246 for ntsc
 				inc ptr2+1
 				lda #35				;C
 				jsr	printspr
-; 2nd row
-				lda #$58
-				sta ptr2+1
-				lda #51 			;S
-				jsr printspr
-				inc ptr2+1
-				lda #33				;A
-				jsr printspr
-				inc ptr2+1
-				lda #54 			;V
-				jsr printspr
 ; 2nd sprite 1st row
 				lda #$80
 				sta ptr2+1
@@ -104,6 +93,17 @@ ntsc2			lda #254						; y coord for backup save 254 for pal, 246 for ntsc
 				jsr printspr
 				inc ptr2+1
 				lda #48 			;P
+				jsr printspr
+; 2nd row
+				lda #$58
+				sta ptr2+1
+				lda #51 			;S
+				jsr printspr
+				inc ptr2+1
+				lda #33				;A
+				jsr printspr
+				inc ptr2+1
+				lda #54 			;V
 				jsr printspr
 ; 2nd sprite 2nd row
 				lda #$98
@@ -171,10 +171,8 @@ continue		; Init SID with empty values
 
 show_load_img	
 ; copy loader bitmap colors into place
-;				lda $5000
-;				sta $d020
-				lda $5001
-				sta $d021
+				lda $5001							; get screen paper colour
+				sta $d021							; and set it
 				ldx #$00
  -				lda $5002,x
 				sta $5c00,x
@@ -194,8 +192,7 @@ show_load_img
 				sta $db00,x
 				inx
 				bne -
-				stx $d020 							; but in the end we want black border
-				
+
 				lda $dd00 							; set VIC-II bank to $4000-$7fff
 				and #$fc
 				ora #2

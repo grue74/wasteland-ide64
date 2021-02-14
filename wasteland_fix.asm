@@ -1,62 +1,7 @@
 ; 
 ; Wasteland IDE fix by Grue & TNT
-; 
-; 	This fix is based on the Wasteland 1MB REU version, which was posted in Lemon64 forums in 2013 by user mood_swing.
-;	He has since sadly removed all postings and links to his fix.
-;	In the end, I had to write much more code and figure out strange behavior due to my inexperience on how
-;	loading works on C64. Problematic is also that the game uses almost all the available memory
-;	
-;	I hope this source code will help to fix more games for IDE64, 
-;	
-; 
-; 	Enchancements done so far: 
-;
-; 		Memory optimizations in the loader, whopping 4 bytes free currently at $fc00-fff9 area
-;		Save game in separate "SAVE" file
-;		Time handler moved from busyloop to IRQ, now time wont run too fast with Turbo
-;		Its now possible to hold left shift or use shiftlock for speeding up the time for healing,
-;		 but be sure to be in safe place to avoid random encounters.
-; 		Reimplemented random routine game uses, it was quite bad for accelerated 6510 usage, original
-;		 routine uses $d012 and $dc04 for entropy, when running cpu with 48Mhz speed those wont help much..
-;		 New routine is from codebase64.org.
-;		Its now possible to use original game image, just create play .d64's from the original game and merge
-;		 and save as "WL"
-;		Implemented Load/Save indicator as green/red sprite at the lower right corner of the screen.
-;		It is now possible to make backup copy of the "SAVE" file during boot. Green border marks successful backup
-;		Detection of faster cpu and adjusting game speed accordingly.
-;		Ultimate 64 users get extra speed if they have enabled Turbo Control: U64 Turbo Registers
-;			
-;		Original cover art loading picture by Duce / Extend
-;
-;		TODO:
-;		 - Implement transferring roster from the old save file to start a new game.
-;			 
-; 			 
-;
-;	Thanks to:
-; 	Soci / Singular for help and code!
-;	TNT / Beyond Force for code, help, support and teaching me 6502 asm.
-;	Trurl / Extend for help, test and suggestions
-;   Zer0-x / Kasettilamerit for a such great tool U64 debug stream!
-;	Codebase64 for being such great reference!
-;
-;	All IDE64 fans!
-; 
-;	Tools used for making this IDE64 fix possible, not in any special order
-;
-;	IDE64
-;	64tass
-;	010 Editor
-; 	Ida pro
-;	Ultimate 64 + ucodenet
-;	U64 debug stream
-;	C64debugger
-;	Vice
-;	Sublime text 3
-;	Max roast level Coffee
-
+ 
 ;	.cpu "6502"
-
 
 track			= $f8
 sector			= $f9
@@ -359,9 +304,9 @@ disk_side_patch .byte $a6,$6b,$ca,$8e,<floppy_side,>floppy_side,$4c,$9e,$18
 				*=$6000
 				.binary "waste_data.bin"
 				
-				sidfile = "Ambient_Music.sid"        ; file name
-				header  = binary(sidfile, $00, $7e)
-				initsid = header[$b:$9:-1]   ; init address (big endian)
-				playsid = header[$d:$b:-1]   ; play address (big endian)
+sidfile 		= "Ambient_Music.sid"        ; file name
+header  		= binary(sidfile, $00, $7e)
+initsid 		= header[$b:$9:-1]   ; init address (big endian)
+playsid 		= header[$d:$b:-1]   ; play address (big endian)
 				*       = header[$7c:$7e]    ; use loading address (little endian)
         		.binary sidfile, $7e ; load music data
