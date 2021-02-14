@@ -1,6 +1,5 @@
 intro			lda #$00
-				jsr initsid 					; init intro sid
-
+				
 ; Clear Memory for Sprites 1 and 2
 				lda #$00
 -				sta $4040,x
@@ -113,9 +112,10 @@ ntsc2			lda #254						; y coord for backup save 254 for pal, 246 for ntsc
 				inc ptr2+1
 				lda #31				;?
 				jsr printspr
-
+				lda #8							; try to make 6581's SNAP less
+				sta $d418
+				jsr initsid 					; init intro sid
 ; Open borders so we can show our text sprites
-
 ; Borders open! Code by HCL, quick copy/paste from the codebase64
 loop			lda #$f9				
 				cmp $d012
@@ -147,7 +147,9 @@ loop			lda #$f9
 				JMP loop
 
 ; make backup copy of the savegame file
-backupsave		ldx #$1f								; empty sid registers, we need to mute intro music
+backupsave		lda #8									; soften 6581 snap by lowering volume before mute
+				sta $d418
+				ldx #$17								; empty sid registers, we need to mute intro music
 				lda #$00
  -				sta $d400,x
 				dex
@@ -160,13 +162,18 @@ backupsave		ldx #$1f								; empty sid registers, we need to mute intro music
 				jmp +
 ; load the game and patch it to work with our loader and other enchancements
 continue		; Init SID with empty values
-		        ldx #$1f
+		        lda #8									; soften 6581 snap by lowering volume before mute
+				sta $d418
+		        ldx #$17
 				lda #$00
  -				sta $d400,x
 				dex
 				bpl -
 +				lda #$00								; sprites off					
 				sta $d015
+				lda #0 									; silence of the sids
+				sta $d418
+
 				rts
 
 show_load_img	
