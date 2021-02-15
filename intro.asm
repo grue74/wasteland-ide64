@@ -12,7 +12,6 @@ intro
 
 ; Scroll our bitmap to the screen
 ; FLD example by HCL from codebase64
-
 loop1	        bit $d011 						; Wait for new frame
 		        bpl *-3
 		        bit $d011
@@ -51,7 +50,7 @@ CalcNumLines	lda NumFLDLines
 		  		jmp backcalc
 NumFLDLines	    .byte $d0
 
-;done scrolling bitmap, time to show some sprites, open border and play music
+;Done scrolling the bitmap, time to show some sprites, open border and play music
 +				lda #$00
 				sta $d025
 				lda #$01
@@ -72,7 +71,6 @@ ntsc2			lda #254						; y coord for backup save 254 for pal, 246 for ntsc
 				sta $5ffa
 
 ; Print text to sprites
-
 ; First row of first sprite
 				lda #34				;B
 				jsr printspr 		;put B into sprite
@@ -115,6 +113,7 @@ ntsc2			lda #254						; y coord for backup save 254 for pal, 246 for ntsc
 				lda #8							; try to make 6581's SNAP less
 				sta $d418
 				jsr initsid 					; init intro sid
+
 ; Open borders so we can show our text sprites
 ; Borders open! Code by HCL, quick copy/paste from the codebase64
 loop			lda #$f9				
@@ -127,6 +126,7 @@ loop			lda #$f9
 				bpl *-3
 				ora #8
 				sta $d011
+
 ; Read keyboard code by TNT / Beyond Force
 				LDA #$EF
 				STA $DC00
@@ -173,7 +173,6 @@ continue		; Init SID with empty values
 				sta $d015
 				lda #0 									; silence of the sids
 				sta $d418
-
 				rts
 
 show_load_img	

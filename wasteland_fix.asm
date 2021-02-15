@@ -31,7 +31,7 @@ w0				LDA $D012
 w1				CMP $D012
     			BEQ w1
     			BMI w0
-; end of codebase64 code
+; End of codebase64 code
 	   			cmp #$37								; check are we running PAL system
     			beq pal									; if so, then skip ntsc fixes
   				lda #$24 								; as ntsc clock runs 60hz, we need to adjust our time running code vs pal 50hz
@@ -39,7 +39,7 @@ w1				CMP $D012
   				lda #246								; we need to raise up save backup sprites as they are not visible on ntsc screen.
   				sta ntsc2+1
 
-; check speed of the cpu
+; Check the speed of the cpu
 pal				lda #3
 				sta $d031								; set U64 turbo to 4Mhz
 				ldx #$00								; clear our counter				
@@ -104,7 +104,7 @@ mod:			lda loader_code,y
 				lda #$35								; Kernal off (this is mandatory as loader is under kernal mem)
 				sta $01
 
-; load game font into memory for enabling text showing sprites
+; Load game font into memory for enabling text showing sprites
 				lda #$00
 				sta load_adr_lo
 				lda #$c6
@@ -145,7 +145,6 @@ mod:			lda loader_code,y
 ; loading on $0200 is really tricky as load/save vectors, filetables etc are there which
 ; ide64 or any other kernal load compatible loading needs. There special code to handle this
 ; but it consumes memory which we dont have plenty as the game uses whole 64k
-
 				lda #0
 				sta load_adr_lo
 				lda #2
@@ -159,11 +158,10 @@ mod:			lda loader_code,y
 				jsr Loader_Call							; Load $0200-$2fff
 
 ; load game intro parts into memory
-				lda #0
-				sta $d020								; change back to black
+				lda #$00
 				sta load_adr_lo
-				lda #$7e
-				sta load_adr_hi
+				lda #$41 								; we load this into other location and transfer it into its place later.
+				sta load_adr_hi							; because its load over to our loader screen and looks ugly.
 				clc
 				adc #$f 								; get 15 blocks
 				sta load_until
@@ -175,7 +173,6 @@ mod:			lda loader_code,y
 ; Done loading and all pieces are on place, now do some patching to use our own loader and enchancements
 
 ; Adjust game delay routine depending on our little cpu speed test earlier			
-
 				lda $c000 								; speedcheck result is here
 				cmp #$50								; did we run faster than 1Mhz?
 				bcc +								 	; naah
@@ -219,7 +216,7 @@ mod:			lda loader_code,y
 				lda #$d0
 				sta $24eb
 
-; patch disk side number -1 routine
+; Patch disk side number -1 routine
 				ldx #$00
 -				lda disk_side_patch,x
 				sta $18c4,x
@@ -227,21 +224,6 @@ mod:			lda loader_code,y
 				cpx #9
 				bne -
 
-; Patch Disk Side Requesters, as we dont need them anymore
-				lda #$ea
-				ldx #$00
--				sta $8228,x
-				sta $8284,x
-				inx
-				cpx #5
-				bne -
-
-; Patch Intro menu text, remove "Utils". It also removes possibility to enter Utils meny all together, handy!
-				ldx #$05
-				lda #$20
--				sta $81b3,x
-				dex
-				bpl -
 
 ; Patch Screen shake bug which was in original game, it restored upperbit also in $d011 value which we dont want.
 				lda #$8b 								; value for x
@@ -250,6 +232,19 @@ mod:			lda loader_code,y
 				sta $076a
 				lda #$8f 								; sax
 				sta $0771
+
+; Empty bitmap area for a smooth transition into the intro
+				lda #$00 								
+				ldx #$1e									
+				ldy #$00 									
+mody:			sta $6000,y
+				iny
+				bne mody
+				inc mody+2
+				dex
+				bne mody
+				lda #$00 								; Switch screen off for even smoohter transition
+				sta $d011
 
 ; Set Screen for originakl game intro gfx
 				ldx #$00
@@ -267,12 +262,41 @@ mod:			lda loader_code,y
 				sta $5f00,x
 				inx
 				bne -
-				
+
 ; Set load indicator sprite pointer and position				
 				lda #$f6
 				sta sprite+1							; restore more suitable sprite pointer
 				lda #242					
 				sta $d001								; sprite 0 coord y
+
+; Copy intro code into its place
+				ldx #$10
+				ldy #0
+modx:			lda $4100,y
+				sta $7e00,y
+				iny
+				bne modx
+				inc modx+2
+				inc modx+5
+				dex
+				bne modx
+
+; Patch Disk Side Requesters, as we dont need them anymore
+				lda #$ea
+				ldx #$00
+-				sta $8228,x
+				sta $8284,x
+				inx
+				cpx #5
+				bne -
+
+; Patch Intro menu text, remove "Utils" text from the options.
+; It also removes the possibility to enter Utils menu all together, handy!
+				ldx #$05
+				lda #$20
+-				sta $81b3,x
+				dex
+				bpl -
 
 ; Set NMI and IRQ, Then we are ready to rock'n'roll
 				lda #<NMI
@@ -285,7 +309,6 @@ mod:			lda loader_code,y
 				sta $ffff
 
 ; Finally, enable irq and jump to intro!
-
 				lda #$01								; enable IRQ
 				sta $d01a
 				jmp $7e00								; Start Intro
@@ -296,15 +319,16 @@ disk_side_patch .byte $a6,$6b,$ca,$8e,<floppy_side,>floppy_side,$4c,$9e,$18
 				.include "initbin.asm"
 				*=$3c00
 				.include "loader.asm"
+				*=$3600
 				.include "fileops.asm"
 				*=$5000
-				.binary "waste_color.bin"
+				.binary "wasteb_color.bin"
 				*=$6000
-				.binary "waste_data.bin"
+				.binary "wasteb_data.bin"
 				
 sidfile 		= "Ambient_Music.sid"        ; file name
 header  		= binary(sidfile, $00, $7e)
 initsid 		= header[$b:$9:-1]   ; init address (big endian)
 playsid 		= header[$d:$b:-1]   ; play address (big endian)
-				*       = header[$7c:$7e]    ; use loading address (little endian)
+				*=header[$7c:$7e]    ; use loading address (little endian)
         		.binary sidfile, $7e ; load music data

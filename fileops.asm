@@ -1,4 +1,3 @@
-				*=$3600
 fopen			
 ; Open file 13 called "SAVE" for saving game roster into separate file for transferring it to new game.
 				lda #13									; file number
@@ -43,13 +42,14 @@ fopen
 				dex
 				bpl -
 				jsr vectorcopy
-				
 				lda #$00 								; set initial disk side before trying to load
 				sta floppy_side
 				rts
 
 ; open file 11 for saving mansave file
-savebackup		lda #11									; file number
+savebackup		lda #5									; Green border for indicating we're in saving biz
+				sta $d020
+				lda #11									; file number
 				ldx $ba									; current drive
 				tay
 				jsr setlfs								; setup file for opening
@@ -80,7 +80,9 @@ chkout2_		jsr $ffff								; set for input
 				ldy #8									; set to save 8 blocks
 				jsr write
 clrchn3_		jsr $ffff
-				lda #5
+				lda #11									; close savebackup
+				jsr close
+				lda #0									; Enough of this green thing, back to black
 				sta $d020
 				rts
 
@@ -101,6 +103,6 @@ vectorcopy		ldx #1									; Copy kernal jump locations from the vectors
 				bpl -
 				rts
 
-mansavename	  	.text "SAVEBACKUP,M"
+mansavename	  	.text "SAVEBACKUP,W"
 filename 		.text "WL,M"
 savename		.text "SAVE,M"
