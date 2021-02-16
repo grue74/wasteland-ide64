@@ -1,5 +1,7 @@
 fopen			
 ; Open file 13 called "SAVE" for saving game roster into separate file for transferring it to new game.
+; We open files at the start so we dont have to do that later, opening and closing files is pretty slow
+; so our in game loader doesnt do that. We will flush writes to disk by using seek command.
 				lda #13									; file number
 				ldx $ba									; current drive
 				tay
@@ -41,52 +43,10 @@ fopen
 				sta zp_swap,x
 				dex
 				bpl -
-				jsr vectorcopy
-				lda #$00 								; set initial disk side before trying to load
-				sta floppy_side
-				rts
 
-; open file 11 for saving mansave file
-savebackup		lda #5									; Green border for indicating we're in saving biz
-				sta $d020
-				lda #11									; file number
-				ldx $ba									; current drive
-				tay
-				jsr setlfs								; setup file for opening
-				lda #12									; lenght of the filename
-				ldx #<mansavename						; location of the filename to open
-				ldy #>mansavename
-				jsr setnam								; setup filename and name lenght
-				jsr open
-
-; Load roster into memory for saving it to mansave 
-				lda #$00								; set load'n'save address
-				sta $fb
-				lda #$90
-				sta $fc
-				ldx #13									; file number
-chkin2_			jsr $ffff								; set for input
-				lda #$fb 								; c64 address to load to
-				ldx #0						 	
-				ldy #8									; set to load 8 blocks
-				jsr read
-clrchn2_		jsr $ffff
-
-; save savebackup
-				ldx #11									; file number
-chkout2_		jsr $ffff								; set for input
-				lda #$fb 								; c64 address save from
-				ldx #0						 
-				ldy #8									; set to save 8 blocks
-				jsr write
-clrchn3_		jsr $ffff
-				lda #11									; close savebackup
-				jsr close
-				lda #0									; Enough of this green thing, back to black
-				sta $d020
-				rts
-
-vectorcopy		ldx #1									; Copy kernal jump locations from the vectors
+; Set locations of the used pointers permanently in our loader code as these locations gets overwritten by game code
+; This is for added compability in possible future IDE64 versions.
+				ldx #1									; Copy kernal jump locations from the vectors
 -				lda $31e,x								; So we dont need to care if they get 
 				sta chkin_+1,x							; overwritten by the game load (they do...)
 				sta chkin2_+1,x
@@ -101,7 +61,51 @@ vectorcopy		ldx #1									; Copy kernal jump locations from the vectors
 				sta chrout_+1,x
 				dex
 				bpl -
+; Set floppy side before initial loads.
+				lda #$00
+				sta floppy_side
 				rts
+
+; open file 11 for saving savebackup file
+savebackup		lda #5									; Green border for indicating we're in saving biz
+				sta $d020
+				lda #11									; File number
+				ldx $ba									; Current drive
+				tay
+				jsr setlfs								; Setup file for opening
+				lda #12									; Lenght of the filename
+				ldx #<mansavename						; Location of the filename to open
+				ldy #>mansavename
+				jsr setnam								; Setup filename and name lenght
+				jsr open
+
+; Load roster into memory for saving it to mansave 
+				lda #$00								; Set load'n'save address
+				sta $fb
+				lda #$90
+				sta $fc
+				ldx #13									; File number
+chkin2_			jsr $ffff								; Set for input
+				lda #$fb 								; c64 address to load to
+				ldx #0						 	
+				ldy #8									; Set to load 8 blocks
+				jsr read
+clrchn2_		jsr $ffff
+
+; save savebackup
+				ldx #11									; File number
+chkout2_		jsr $ffff								; Set for input
+				lda #$fb 								; C64 address save from
+				ldx #0						 
+				ldy #8									; Set to save 8 blocks
+				jsr write
+clrchn3_		jsr $ffff
+				lda #11									; Close savebackup file
+				jsr close								; We close savebackup file because its not used anymore. No need to keep it open.
+				lda #0									; Enough of this green thing, back to black
+				sta $d020
+				rts
+
 
 mansavename	  	.text "SAVEBACKUP,W"
 filename 		.text "WL,M"

@@ -21,12 +21,42 @@ timetest		= $fffd
 
 
 				* = $3000
-start			sei										; we dont need interrupts where we are going, atleast not yet
 				lda #$00 								; black is very beautiful, dont you agree?
 				sta $d020
 				sta $d021
-				
-; PAL / NTSC check, Grahams variant from codebase64
+				ldx #$00 								; Fill screen with " "
+-				lda #$20
+				sta $0400,x
+				sta $0500,x
+				sta $0600,x
+				sta $0700,x
+				lda #$05
+				sta $d800,x								; set color ram  green
+				sta $d900,x
+				sta $da00,x
+				sta $db00,x
+				inx
+				bne -
+-				lda info,x								; print text on the screen
+				cmp #$ff
+				beq +
+				sta $0400,x
+				inx
+				bne -
++				ldx #$c0
+-				lda $d012								; wait for some frames
+				cmp #$ff
+				bne -
+-				lda $d012
+				cmp #$10
+				bne -
+				inx
+				bne --
+
+
+				sei										; we dont need interrupts where we are going, atleast not yet
+								
+; PAL / NTSC check, Grahams variant from the Codebase64
 w0				LDA $D012
 w1				CMP $D012
     			BEQ w1
@@ -127,9 +157,9 @@ mod:			lda loader_code,y
 				sta $d01c								; sprite 0 hires other MC
 				lda #84									; 84
 				sta $d000								; sprite 0 coord x
-				lda #245								; 252
+				lda #245								; 245
 				sta $d001								; sprite 0 coord y
-				lda #%00000110
+				lda #%00000110							; we use sprites 1 and 2 on loading picture screen
 				sta $d015								; sprites on
 				lda #$00								; sprite pointer for sprite 0
 				sta sprite+1
@@ -141,9 +171,9 @@ mod:			lda loader_code,y
 
 				jsr intro								; show intro
 
-; now we are finally in real game loading bizniz, load main game code $0200 - $2fff
-; loading on $0200 is really tricky as load/save vectors, filetables etc are there which
-; ide64 or any other kernal load compatible loading needs. There special code to handle this
+; Now we are finally in real game loading bizniz, load main game code $0200 - $2fff
+; Loading at $0200 is really tricky as filetables etc are there which
+; ide64 or any other kernal load compatible loading needs. There is a special code to handle this
 ; but it consumes memory which we dont have plenty as the game uses whole 64k
 				lda #0
 				sta load_adr_lo
@@ -171,7 +201,6 @@ mod:			lda loader_code,y
 				jsr Loader_Call							; Load $7e00-$8dff
 
 ; Done loading and all pieces are on place, now do some patching to use our own loader and enchancements
-
 ; Adjust game delay routine depending on our little cpu speed test earlier			
 				lda $c000 								; speedcheck result is here
 				cmp #$50								; did we run faster than 1Mhz?
@@ -225,7 +254,7 @@ mod:			lda loader_code,y
 				bne -
 
 
-; Patch Screen shake bug which was in original game, it restored upperbit also in $d011 value which we dont want.
+; Patch Screen shake bug which was in original game, it restored upperbit in $d011 value which we dont want.
 				lda #$8b 								; value for x
 				sta $0754
 				lda #$30								; bmi
@@ -243,7 +272,7 @@ mody:			sta $6000,y
 				inc mody+2
 				dex
 				bne mody
-				lda #$00 								; Switch screen off for even smoohter transition
+				lda #$00 								; Switch screen off for even smoother transition
 				sta $d011
 
 ; Set Screen for originakl game intro gfx
@@ -313,6 +342,7 @@ modx:			lda $4100,y
 				sta $d01a
 				jmp $7e00								; Start Intro
 
+
 disk_side_patch .byte $a6,$6b,$ca,$8e,<floppy_side,>floppy_side,$4c,$9e,$18
 
 				.include "intro.asm"
@@ -322,13 +352,16 @@ disk_side_patch .byte $a6,$6b,$ca,$8e,<floppy_side,>floppy_side,$4c,$9e,$18
 				*=$3600
 				.include "fileops.asm"
 				*=$5000
-				.binary "wasteb_color.bin"
+				.binary "waste_color.bin"
 				*=$6000
-				.binary "wasteb_data.bin"
-				
-sidfile 		= "Ambient_Music.sid"        ; file name
+				.binary "waste_data.bin"
+
+sidfile 		= "Ambient_Music.sid"					; file name
 header  		= binary(sidfile, $00, $7e)
-initsid 		= header[$b:$9:-1]   ; init address (big endian)
-playsid 		= header[$d:$b:-1]   ; play address (big endian)
-				*=header[$7c:$7e]    ; use loading address (little endian)
-        		.binary sidfile, $7e ; load music data
+initsid 		= header[$b:$9:-1]						; init address (big endian)
+playsid 		= header[$d:$b:-1]						; play address (big endian)
+				*=header[$7c:$7e]						; use loading address (little endian)
+        		.binary sidfile, $7e					; load music data
+        		.enc screen
+info			.text "IDE64 FIX BY GRUE"
+				.byte $ff

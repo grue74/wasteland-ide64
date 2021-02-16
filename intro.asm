@@ -1,7 +1,5 @@
-intro
-	
 ; Clear Memory for Sprites 1 and 2
-				ldx #$7f
+intro			ldx #$7f
 				lda #$00
 -				sta $4040,x
 				dex
