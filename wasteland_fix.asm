@@ -363,5 +363,5 @@ playsid 		= header[$d:$b:-1]						; play address (big endian)
 				*=header[$7c:$7e]						; use loading address (little endian)
         		.binary sidfile, $7e					; load music data
         		.enc "screen"
-info			.text "IDE64 FIX BY GRUE"
+info			.text "WASTELAND ENCHANCED IDE64 FIX BY GRUE"
 				.byte $ff

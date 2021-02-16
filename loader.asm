@@ -364,9 +364,11 @@ ntsc			adc #$2c 					; $2c for pal, $24 for ntsc
 ; Check if game wait code got overwritten and replace it our turbo friendly version if it does
 ; Random routine is good place to check as if it gets run very often.
 
-random			lda $7e8f 					; game does load on itself on some occasion
-				cmp #$29					; check if we need to patch passage of time
-				bne + 						; nope, we are running on our own code, skip restore
+random			lda $7e87 					; game does load on itself on some occasion
+				cmp #$a9					; check if we need to patch passage of time
+				beq + 						; nope, we are running on our own code, skip restore
+				cmp #$7e					; are at intro code?
+				beq +						; yes we are, exit
 				txa
 				pha							; store x as we are going to trash it
 				ldx #12-1
