@@ -362,6 +362,6 @@ initsid 		= header[$b:$9:-1]						; init address (big endian)
 playsid 		= header[$d:$b:-1]						; play address (big endian)
 				*=header[$7c:$7e]						; use loading address (little endian)
         		.binary sidfile, $7e					; load music data
-        		.enc screen
+        		.enc "screen"
 info			.text "IDE64 FIX BY GRUE"
 				.byte $ff
