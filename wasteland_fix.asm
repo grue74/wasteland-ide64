@@ -322,7 +322,7 @@ modx:			lda $4100,y
 ; Patch Intro menu text, remove "Utils" text from the options.
 ; It also removes the possibility to enter Utils menu all together, handy!
 				ldx #$05
-				lda #$20
+				lda #$00
 -				sta $81b3,x
 				dex
 				bpl -
